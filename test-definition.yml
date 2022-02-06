@@ -1,0 +1,279 @@
+openapi: 3.0.3
+info:
+  title: metrics
+  version: '1.0'
+  contact:
+    name: Jacobo B.Q.
+    email: jacobo@lostrego.org
+  license:
+    name: MIT
+  description: 'This REST API describes the interface of a metrics server. New metrics can be created providing a name for them. Afterwards, new datapoints can be added to those metrics and retrieved as necessary.'
+servers:
+  - url: 'http://localhost:8080'
+    description: Local
+  - url: 'https://metrics-visualizer.herokuapp.com'
+    description: Heroku
+paths:
+  /metric:
+    get:
+      summary: List metrics
+      tags:
+        - metric
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Metric'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      operationId: list-metrics
+      description: Lists all available metrics
+  '/metric/{name}':
+    parameters:
+      - schema:
+          type: string
+        name: name
+        in: path
+        required: true
+    get:
+      summary: Get metric by name
+      tags:
+        - metric
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Metric'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      operationId: get-metric-name
+      description: Return data about a metric given its name
+    delete:
+      summary: Delete metric by name
+      operationId: delete-metric-name
+      responses:
+        '204':
+          description: No Content
+        '404':
+          description: Not Found
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      description: Delete a metric given its name
+      tags:
+        - metric
+  '/metric/{name}/point':
+    parameters:
+      - schema:
+          type: string
+        name: name
+        in: path
+        required: true
+    get:
+      summary: List datapoints by metric name
+      tags:
+        - datapoint
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Datapoint'
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      operationId: list-metric-name-points
+      description: List datapoints for a given metric
+      parameters:
+        - schema:
+            type: string
+            format: date-time
+          in: query
+          name: from
+          required: true
+          description: Earliest date for a datapoint to be included in the response
+        - schema:
+            type: string
+            format: date-time
+          in: query
+          name: to
+          required: true
+          description: Latest date for a datapoint to be included in the response
+    post:
+      summary: Add a new datapoint
+      operationId: post-metric-name-point
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Datapoint'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Collision'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Datapoint'
+      description: Add a datapoint to a metric
+      tags:
+        - datapoint
+  '/metric/{name}/point/{time}':
+    parameters:
+      - schema:
+          type: string
+        name: name
+        in: path
+        required: true
+      - schema:
+          type: string
+          format: date-time
+        name: time
+        in: path
+        required: true
+    get:
+      summary: Get datapoint by name and time
+      tags:
+        - datapoint
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Datapoint'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      operationId: get-metric-name-point-time
+      description: Get a datapoint given its metric's name and its time
+components:
+  schemas:
+    Metric:
+      title: Metric
+      type: object
+      description: A named metric that can contain datapoints
+      properties:
+        name:
+          type: string
+          description: Name of this metric
+          maxLength: 256
+          minLength: 1
+        size:
+          type: integer
+          description: Amount of datapoints currently in this metric
+          readOnly: true
+        start:
+          type: string
+          format: date-time
+          description: Earliest datapoint date for this metric if any
+          readOnly: true
+        end:
+          type: string
+          format: date-time
+          description: Latest datapoint entry for this metric if any
+          readOnly: true
+      required:
+        - name
+        - size
+    Datapoint:
+      title: Datapoint
+      type: object
+      description: Represents a point of date in time for an specific metric
+      properties:
+        metric:
+          type: string
+          description: Name of the metric this datapoint belongs to
+          readOnly: true
+        time:
+          type: string
+          format: date-time
+          description: Instant of this datapoint
+          readOnly: true
+        value:
+          type: number
+          format: double
+          description: Value of the metric for this datapoint
+      required:
+        - time
+        - value
+  responses:
+    InternalServerError:
+      description: Unespecified error encountered while processing the request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: string
+              description:
+                type: string
+            required:
+              - code
+              - description
+    Collision:
+      description: An entity with the same identifier already exists
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: string
+              description:
+                type: string
+            required:
+              - code
+              - description
+    BadRequest:
+      description: Request data does not conform to specifications
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: string
+              description:
+                type: string
+            required:
+              - code
+              - description
+    NotFound:
+      description: Unable to find an entity with a matching ID
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: string
+                description: ''
+              description:
+                type: string
+            required:
+              - code
+              - description
+tags:
+  - name: datapoint
+  - name: metric
