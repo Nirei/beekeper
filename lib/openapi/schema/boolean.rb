@@ -1,11 +1,12 @@
 # frozen_string_literal: true
 
-require 'openapi/schema'
+require 'openapi/schema/schema'
 
 module Apiculturist
-  class Integer < Schema
+  class Boolean < Schema
     def initialize(data)
       super(data)
+      @default = data['default']
     end
   end
 end

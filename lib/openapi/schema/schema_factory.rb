@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-require 'openapi/type/array'
-require 'openapi/type/boolean'
-require 'openapi/type/integer'
-require 'openapi/type/number'
-require 'openapi/type/object'
-require 'openapi/type/string'
+require 'openapi/schema/array'
+require 'openapi/schema/boolean'
+require 'openapi/schema/integer'
+require 'openapi/schema/number'
+require 'openapi/schema/object'
+require 'openapi/schema/string'
 
 module Apiculturist
   module SchemaFactory
@@ -16,6 +16,7 @@ module Apiculturist
       when Type::ARRAY then Apiculturist::Array.new(data)
       when Type::BOOLEAN then Apiculturist::Boolean.new(data)
       when Type::INTEGER then Apiculturist::Integer.new(data)
+      when Type::NULL then Apiculturist::Null.new(data)
       when Type::NUMBER then Apiculturist::Number.new(data)
       when Type::OBJECT then Apiculturist::Object.new(data)
       when Type::STRING then Apiculturist::String.new(data)
@@ -27,6 +28,7 @@ module Apiculturist
       ARRAY = 'array'
       BOOLEAN = 'boolean'
       INTEGER = 'integer'
+      NULL = 'null'
       NUMBER = 'number'
       OBJECT = 'object'
       STRING = 'string'

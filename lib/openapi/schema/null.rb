@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require 'openapi/schema'
+require 'openapi/schema/schema'
 
 module Apiculturist
-  class Boolean < Schema
+  class Null < Schema
     def initialize(data)
       super(data)
     end

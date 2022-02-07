@@ -1,18 +1,22 @@
 # frozen_string_literal: true
 
-require 'openapi/schema'
+require 'openapi/schema/schema'
 
 module Apiculturist
   class String < Schema
     def initialize(data)
       super(data)
+      @format = data['format'] || StringFormat::NONE
       @default = data['default']
       @pattern = data['pattern']
+      @enum = data['enum'].clone || []
+      @enum.freeze
       @min_length = data['minLength']
       @max_length = data['maxLength']
     end
 
     attr_reader :default
+    attr_reader :enum
     attr_reader :pattern
     attr_reader :min_length
     attr_reader :max_length

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'openapi/schema_factory'
+require 'openapi/schema/schema_factory'
 
 module Apiculturist
   # Contains an OpenAPI model definition

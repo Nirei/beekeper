@@ -1,13 +1,14 @@
 # frozen_string_literal: true
 
-require 'openapi/schema'
-require 'openapi/schema_factory'
+require 'openapi/schema/schema'
+require 'openapi/schema/schema_factory'
 
 module Apiculturist
   class Object < Schema
     def initialize(data)
       super(data)
       @properties = parse_properties(data['properties'])
+      @properties.freeze
       @required = data['required'] || []
       @additional_properties = data['additionalProperties'] || false
       @min_properties = data['minProperties']
