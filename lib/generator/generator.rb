@@ -14,8 +14,6 @@ module Apiculturist
     # use sorbet and sorbet-rails for parsing / validation and providing type safety.
     def generate
       parse_spec
-      create_code
-      write_files
     end
 
     private
