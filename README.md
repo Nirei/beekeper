@@ -1,5 +1,6 @@
 # apiculturist
-A static code generator that turns OpenAPI definitions into sorbet-rails code.
+A static code generator that turns OpenAPI definitions into sorbet-rails code. It's 100% writter in Ruby and has no
+dependencies. The intention is to keep it simple and blazingly fast.
 
 # Try it out
 
