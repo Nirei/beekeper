@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'time'
+require 'templating/formatter'
 require 'templating/filesystem/folder'
 require 'templating/sorbet_rails/model_serializer'
 
@@ -8,11 +10,15 @@ module Beekeeper
     def initialize(config)
       @output_path = config['output-path']
       @module_name = config['module-name']
-      # TODO: Dinamically pick the appropriate serializer from configuration values
-      @model_serializer = SorbetRails::ModelSerializer.new(module_name)
     end
 
     def codify(spec)
+      # Create file header comment
+      header = Formatter.file_header(spec.title, spec.version, Time.now.utc.iso8601)
+
+      # TODO: Dinamically pick the appropriate serializer from configuration values
+      model_serializer = SorbetRails::ModelSerializer.new(header, module_name)
+
       Filesystem::Folder.root(output_path) do |fs|
         fs.folder 'models' do |fs|
           spec.models.map do |model|
@@ -38,6 +44,5 @@ module Beekeeper
 
     attr_reader :output_path
     attr_reader :module_name
-    attr_reader :model_serializer
   end
 end
