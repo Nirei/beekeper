@@ -2,7 +2,8 @@
 A static code generator that turns OpenAPI definitions into sorbet-rails code. It's 100% writter in Ruby and has no
 dependencies. The intention is to keep it simple and blazingly fast.
 
-
+The name is just a synonym of _apiculturist_ which was the original name of the project... Because, you know... it deals
+with APIs...
 
 ## Try it out
 
