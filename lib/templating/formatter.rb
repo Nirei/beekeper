@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Apiculturist
+module Beekeeper
   module Formatter
     def self.snake_case(string)
       string

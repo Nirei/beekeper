@@ -3,8 +3,8 @@
 require 'yaml'
 require 'generator/generator'
 
-# Main module for the apiculturist gem. Exposes the code generation API.
-module Apiculturist
+# Main module for the beekeeper gem. Exposes the code generation API.
+module Beekeeper
   ERROR_CONFIG_BOTH = 'Either a configuration object or a configuration file path can be specified, but not both'
   ERROR_CONFIG_NONE = 'Please specify generator configuration'
 

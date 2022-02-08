@@ -3,8 +3,8 @@
 require 'yaml'
 require 'openapi/spec'
 
-module Apiculturist
-  # Transforms an OpenAPI spec file into an Apiculturist::Spec instance
+module Beekeeper
+  # Transforms an OpenAPI spec file into an Beekeeper::Spec instance
   module SpecParser
     def self.parse(spec_file_path)
       # TODO: Validate against OpenAPI JSON Schema

@@ -3,7 +3,7 @@
 require 'templating/filesystem/folder'
 require 'templating/sorbet_rails/model_serializer'
 
-module Apiculturist
+module Beekeeper
   class TemplatingEngine
     def initialize(config)
       @output_path = config['output-path']

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Apiculturist
+module Beekeeper
   # Contains an OpenAPI operation definition
   class Operation
 

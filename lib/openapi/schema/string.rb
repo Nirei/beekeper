@@ -2,7 +2,7 @@
 
 require 'openapi/schema/schema'
 
-module Apiculturist
+module Beekeeper
   class String < Schema
     def initialize(data, required)
       super(data)

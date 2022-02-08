@@ -3,7 +3,7 @@
 require 'templating/formatter'
 require 'templating/sorbet_rails/schema_serializer'
 
-module Apiculturist
+module Beekeeper
   module SorbetRails
     class ModelSerializer
       def initialize(module_name)

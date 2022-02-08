@@ -4,7 +4,7 @@ require 'generator/generator_config'
 require 'generator/spec_parser'
 require 'templating/templating_engine'
 
-module Apiculturist
+module Beekeeper
   # Core class in charge of code generation
   class Generator
     def initialize(config)

@@ -3,7 +3,7 @@
 require 'openapi/schema/schema'
 require 'openapi/schema/schema_factory'
 
-module Apiculturist
+module Beekeeper
   class Object < Schema
     def initialize(data, required)
       super(data)

@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-module Apiculturist
+module Beekeeper
   ERROR_CONFIG_PARSE = 'Error parsing config, mandatory attribute `%<name>s` not found'
 
-  # Data class to contain necessary config for Apiculturist::Generator
+  # Data class to contain necessary config for Beekeeper::Generator
   class GeneratorConfig
     def initialize(config)
       @spec = parse_attr(config, 'spec-path')

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Apiculturist
+module Beekeeper
   # See https://spec.openapis.org/oas/latest.html#schema-object
   # See https://datatracker.ietf.org/doc/html/draft-bhutton-json-schema-00
   class Schema

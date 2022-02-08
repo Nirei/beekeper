@@ -3,7 +3,7 @@
 require 'templating/filesystem/node'
 require 'templating/filesystem/file'
 
-module Apiculturist
+module Beekeeper
   # The Filesystem module provides a simple DSL for defining relative directory structures containing text files.
   # It can be used as follows
   # ```

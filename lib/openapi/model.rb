@@ -2,7 +2,7 @@
 
 require 'openapi/schema/schema_factory'
 
-module Apiculturist
+module Beekeeper
   # Contains an OpenAPI model definition
   class Model
     def initialize(data)

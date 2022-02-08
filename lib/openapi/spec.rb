@@ -2,7 +2,7 @@
 
 require 'openapi/model'
 
-module Apiculturist
+module Beekeeper
   # Represents an OpenAPI spec
   class Spec
     def initialize(spec)

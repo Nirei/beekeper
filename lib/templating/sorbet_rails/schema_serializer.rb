@@ -8,7 +8,7 @@ require 'openapi/schema/number'
 require 'openapi/schema/object'
 require 'openapi/schema/string'
 
-module Apiculturist
+module Beekeeper
   module SorbetRails
     class SchemaSerializer
       def initialize(name, schema)
@@ -18,13 +18,13 @@ module Apiculturist
 
       def serialize
         case schema
-        when Apiculturist::Array then serialize_array
-        when Apiculturist::Boolean then serialize_boolean
-        when Apiculturist::Integer then serialize_integer
-        when Apiculturist::Null then serialize_null
-        when Apiculturist::Number then serialize_number
-        when Apiculturist::Object then serialize_object
-        when Apiculturist::String then serialize_string
+        when Beekeeper::Array then serialize_array
+        when Beekeeper::Boolean then serialize_boolean
+        when Beekeeper::Integer then serialize_integer
+        when Beekeeper::Null then serialize_null
+        when Beekeeper::Number then serialize_number
+        when Beekeeper::Object then serialize_object
+        when Beekeeper::String then serialize_string
         else raise "unknown schema class #{schema.class}"
         end
       end

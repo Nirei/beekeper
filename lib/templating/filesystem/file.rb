@@ -2,7 +2,7 @@
 
 require 'templating/filesystem/node'
 
-module Apiculturist
+module Beekeeper
   module Filesystem
     class File < Node
       def initialize(parent, name)
