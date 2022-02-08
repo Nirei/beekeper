@@ -30,6 +30,8 @@ module Apiculturist
         @children = []
       end
 
+      attr_reader :children
+
       # Begins a relative directory structure definition, see `Filesystem`
       def self.root(name)
         root = Folder.new(nil, name)
@@ -40,7 +42,7 @@ module Apiculturist
       def add(node)
         raise "illegal argument #{node}" unless node.is_a? Node
 
-        @children.push(node)
+        children.push(node)
       end
 
       def folder(name, &block)
@@ -53,6 +55,11 @@ module Apiculturist
         child = File.new(self, name)
         add(child)
         yield child
+      end
+
+      def write!
+        Dir.mkdir path unless Dir.exists? path
+        children.each(&:write!)
       end
     end
   end

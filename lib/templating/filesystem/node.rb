@@ -13,7 +13,7 @@ module Apiculturist
 
       def path
         return name if parent.nil?
-        return File.join(parent.path, name)
+        return ::File.join(parent.path, name)
       end
     end
   end

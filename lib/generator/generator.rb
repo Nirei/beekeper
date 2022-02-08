@@ -34,7 +34,7 @@ module Apiculturist
     end
 
     def write_output(files)
-      files
+      files.write!
     end
   end
 end
