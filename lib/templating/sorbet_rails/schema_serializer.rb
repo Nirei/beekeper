@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'pathname'
 require 'openapi/schema/array'
 require 'openapi/schema/boolean'
 require 'openapi/schema/integer'
@@ -10,6 +11,9 @@ require 'openapi/schema/string'
 
 module Beekeeper
   module SorbetRails
+    ERROR_REMOTE_FILE = 'references to remote files are not currently supported'
+    ERROR_ANOTHER_FILE = 'references to different files are not currently supported'
+
     class SchemaSerializer
       def initialize(name, schema)
         @name = name
@@ -43,18 +47,26 @@ module Beekeeper
       end
 
       def serialize_object
-        [
-          "# #{schema.description}",
+        code = []
+        code.push "# #{schema.description}" unless schema.description.nil?
+        
+        code.concat [
           "class #{Formatter.camel_case name} < T::Struct",
           Formatter.indent(serialize_object_properties schema.properties),
           "end",
           "",
           queue.map(&:serialize)
-        ].flatten
+        ]
+        code.flatten
       end
 
       def serialize_ref
-        "REF"
+        # TODO: Support all this stuff I guess
+        raise ERROR_REMOTE_FILE unless schema.uri.host.nil? || schema.uri.host.empty?
+        raise ERROR_ANOTHER_FILE unless schema.uri.path.nil? || schema.uri.path.empty?
+
+        # FIXME: This is in poor taste and relying on too many assumptions
+        model_name = Pathname.new(schema.uri.fragment).split[-1].to_s
       end
 
       # Iterate over object properties
