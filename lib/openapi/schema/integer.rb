@@ -5,8 +5,7 @@ require 'openapi/schema/schema'
 module Beekeeper
   class Integer < Schema
     def initialize(data, required)
-      super(data)
-      @required = required
+      super(data, required)
       @format = data['format'] || IntegerFormat::NONE
       @enum = data['enum'].clone || []
       @enum.freeze
@@ -17,8 +16,6 @@ module Beekeeper
       @multiple_of = data['multipleOf']
     end
 
-    attr_reader :required
-    alias_method :required?, :required
     attr_reader :format
     attr_reader :enum
     attr_reader :minimum

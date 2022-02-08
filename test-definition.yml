@@ -1,279 +1,594 @@
-openapi: 3.0.3
+openapi: 3.0.0
 info:
-  title: metrics
+  title: Game-Affinity
   version: '1.0'
-  contact:
-    name: Jacobo B.Q.
-    email: jacobo@lostrego.org
-  license:
-    name: MIT
-  description: 'This REST API describes the interface of a metrics server. New metrics can be created providing a name for them. Afterwards, new datapoints can be added to those metrics and retrieved as necessary.'
+  description: A social network to rate and share your thoughts on videogames and find like-minded gamers
+  contact: {}
 servers:
-  - url: 'http://localhost:8080'
-    description: Local
-  - url: 'https://metrics-visualizer.herokuapp.com'
-    description: Heroku
+  - url: 'http://localhost:3000'
+    description: Localhost
 paths:
-  /metric:
+  /game:
     get:
-      summary: List metrics
+      summary: List games
       tags:
-        - metric
+        - browse
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Metric'
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/PageMetadata'
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/GameData'
+                required:
+                  - metadata
+                  - data
+        '400':
+          description: Bad Request
         '500':
-          $ref: '#/components/responses/InternalServerError'
-      operationId: list-metrics
-      description: Lists all available metrics
-  '/metric/{name}':
+          description: Internal Server Error
+      operationId: list-games
+      description: Fetch a list of available games that match some keywords
+      parameters:
+        - schema:
+            type: string
+          in: query
+          name: search
+          description: Keywords for the search
+        - schema:
+            type: string
+          in: query
+          name: sort
+          description: Field to use to sort the search results
+  '/game/{id}':
     parameters:
       - schema:
           type: string
-        name: name
+        name: id
         in: path
         required: true
+        description: Unique ID of the browsed game
     get:
-      summary: Get metric by name
+      summary: Get game
       tags:
-        - metric
+        - browse
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Metric'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-      operationId: get-metric-name
-      description: Return data about a metric given its name
-    delete:
-      summary: Delete metric by name
-      operationId: delete-metric-name
-      responses:
-        '204':
-          description: No Content
-        '404':
-          description: Not Found
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-      description: Delete a metric given its name
-      tags:
-        - metric
-  '/metric/{name}/point':
-    parameters:
-      - schema:
-          type: string
-        name: name
-        in: path
-        required: true
-    get:
-      summary: List datapoints by metric name
-      tags:
-        - datapoint
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Datapoint'
+                $ref: '#/components/schemas/GameDetail'
+        '400':
+          description: Bad Request
         '404':
           description: Not Found
         '500':
           description: Internal Server Error
-      operationId: list-metric-name-points
-      description: List datapoints for a given metric
-      parameters:
-        - schema:
-            type: string
-            format: date-time
-          in: query
-          name: from
-          required: true
-          description: Earliest date for a datapoint to be included in the response
-        - schema:
-            type: string
-            format: date-time
-          in: query
-          name: to
-          required: true
-          description: Latest date for a datapoint to be included in the response
-    post:
-      summary: Add a new datapoint
-      operationId: post-metric-name-point
-      responses:
-        '201':
-          description: Created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Datapoint'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
-          $ref: '#/components/responses/Collision'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Datapoint'
-      description: Add a datapoint to a metric
-      tags:
-        - datapoint
-  '/metric/{name}/point/{time}':
-    parameters:
-      - schema:
-          type: string
-        name: name
-        in: path
-        required: true
-      - schema:
-          type: string
-          format: date-time
-        name: time
-        in: path
-        required: true
+      operationId: get-game-by-id
+      description: Get detailed information about a game given its ID
+  /profile:
     get:
-      summary: Get datapoint by name and time
+      summary: Get current user's public profile
       tags:
-        - datapoint
+        - social
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Datapoint'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                $ref: '#/components/schemas/UserPublic'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
         '500':
-          $ref: '#/components/responses/InternalServerError'
-      operationId: get-metric-name-point-time
-      description: Get a datapoint given its metric's name and its time
+          description: Internal Server Error
+      operationId: get-profile
+      description: Get the public profile of the currently logged-in user.
+    put:
+      summary: Update current user's public profile
+      operationId: put-profile
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPublic'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+      description: Modify the profile of the currently logged-in user.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserPublic'
+      tags:
+        - social
+  /profile/friend:
+    get:
+      summary: List friends
+      tags:
+        - social
+      responses:
+        '200':
+          description: OK
+          headers: {}
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/PageMetadata'
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UserPublic'
+                required:
+                  - metadata
+                  - data
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+      operationId: list-friends
+      description: List all friends of the logged-in user. This is an authenticated endpoint.
+    post:
+      summary: ''
+      operationId: add-friend
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserId'
+        description: ''
+      description: Add a friend to the logged-in user's friend list. This is an authenticated endpoint.
+      tags:
+        - social
+    parameters: []
+  '/profile/friend/{id}':
+    parameters:
+      - schema:
+          type: string
+        name: id
+        in: path
+        required: true
+    delete:
+      summary: Delete friend
+      operationId: delete-friend-by-id
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      description: Add a friend to the logged-in user's friend list. This is an authenticated endpoint.
+      tags:
+        - social
+  /user:
+    get:
+      summary: List users
+      tags:
+        - social
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/PageMetadata'
+                  data:
+                    $ref: '#/components/schemas/UserPublic'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+      operationId: list-users
+      description: Search a list of users matching some keywords.
+      parameters:
+        - schema:
+            type: string
+          in: query
+          name: search
+          description: Keywords for the search
+        - schema:
+            type: string
+          in: query
+          name: sort
+          description: Field to use to sort the search results
+  '/user/{id}':
+    parameters:
+      - schema:
+          type: string
+        name: id
+        in: path
+        required: true
+    get:
+      summary: Get user
+      tags:
+        - social
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPublic'
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      operationId: get-user-by-id
+      description: Obtain an user's publicly available information. This is a public endpoint.
+  '/user/{id}/friend':
+    parameters:
+      - schema:
+          type: string
+        name: id
+        in: path
+        required: true
+    get:
+      summary: List user's friends
+      tags:
+        - social
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    $ref: '#/components/schemas/PageMetadata'
+                  data:
+                    $ref: '#/components/schemas/UserPublic'
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      operationId: get-user-friends-by-id
+      description: List an user's friends.
+  /account:
+    get:
+      summary: Get account information
+      tags:
+        - auth
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+      operationId: get-account
+      description: Get user's private account information
+    put:
+      summary: Update account
+      operationId: post-account
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+      description: 'Update account details. If the email is changed using this endpoint, the account''s validationStatus will change to UNCONFIRMED and a confirmation email will be send to the user.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Account'
+      tags:
+        - auth
+  /account/password:
+    put:
+      summary: Modify password
+      operationId: put-account-password
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  format: password
+                  minLength: 8
+                  description: User's new password text
+                  writeOnly: true
+              required:
+                - password
+      tags:
+        - auth
+      description: Update the current logged-in user's password.
 components:
   schemas:
-    Metric:
-      title: Metric
+    PageMetadata:
+      title: PageMetadata
       type: object
-      description: A named metric that can contain datapoints
+      description: Generic metadata for paged requests
       properties:
+        count:
+          type: integer
+          description: Number of received elements
+        total:
+          type: integer
+          description: Total number of available elements
+        start:
+          type: integer
+          description: Number of the first element of this page
+        finish:
+          type: integer
+          description: Number of the last element of this page
+        previous:
+          type: string
+          format: uri
+          description: Link to the previous page
+        next:
+          type: string
+          format: uri
+          description: Link to the next page
+      required:
+        - count
+        - total
+    GameData:
+      title: GameData
+      type: object
+      description: Basic data about a game.
+      properties:
+        id:
+          type: string
+          description: Unique ID of this game
+        title:
+          type: string
+          minLength: 1
+          description: Title of this game
+        summary:
+          type: string
+          minLength: 1
+          description: Summary of this game
+        developer:
+          type: object
+          description: Company responsible for the development of this game
+          required:
+            - id
+            - name
+          properties:
+            id:
+              type: string
+              description: Unique ID of the developer
+            name:
+              type: string
+              description: Name of the developer
+        publisher:
+          type: object
+          description: Company responsible for the distribution of this game
+          required:
+            - id
+            - name
+          properties:
+            id:
+              type: string
+              description: Unique ID of the publisher
+            name:
+              type: string
+              description: Name of the publisher
+        rating:
+          type: object
+          description: Rating data for this game
+          required:
+            - voters
+          properties:
+            value:
+              type: number
+              minimum: 1
+              maximum: 10
+              description: Numerical score for this game
+            voters:
+              type: integer
+              minimum: 0
+              description: Number of people who have given their opinion for this game
+        releaseDate:
+          type: object
+          description: 'Date of the game release, can be partial'
+          properties:
+            year:
+              type: string
+              description: Year of release
+            month:
+              type: string
+              description: Month of release
+            day:
+              type: string
+              description: Day of release
+          required:
+            - year
+        cover:
+          type: string
+          format: uri
+        genres:
+          type: array
+          items:
+            type: string
+        platforms:
+          type: array
+          items:
+            type: string
+      required:
+        - id
+        - title
+        - summary
+        - developer
+        - publisher
+        - rating
+        - cover
+        - genres
+        - platforms
+    GameDetail:
+      title: GameDetail
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/GameData'
+        description:
+          type: string
+      required:
+        - data
+        - description
+    UserPublic:
+      title: UserPublic
+      type: object
+      description: Public information about an user
+      properties:
+        id:
+          type: string
+          description: User's ID
+          readOnly: true
         name:
           type: string
-          description: Name of this metric
-          maxLength: 256
-          minLength: 1
-        size:
+          description: User's name
+        avatar:
+          type: string
+          description: Profile picture of the user
+          format: uri
+        bio:
+          type: string
+          description: User's bio
+        location:
+          type: string
+          description: User's location
+        age:
+          type: string
+          description: Age of the user
+        friends:
           type: integer
-          description: Amount of datapoints currently in this metric
-          readOnly: true
-        start:
+          description: Number of friends of this user
+        ratings:
+          type: integer
+          description: Number of games the user has rated
+        registered:
           type: string
-          format: date-time
-          description: Earliest datapoint date for this metric if any
-          readOnly: true
-        end:
-          type: string
-          format: date-time
-          description: Latest datapoint entry for this metric if any
+          description: Date at which this user registered their account
+          format: date
           readOnly: true
       required:
+        - id
         - name
-        - size
-    Datapoint:
-      title: Datapoint
+        - avatar
+        - bio
+        - friends
+        - ratings
+        - registered
+    UserId:
+      title: UserId
       type: object
-      description: Represents a point of date in time for an specific metric
       properties:
-        metric:
+        id:
           type: string
-          description: Name of the metric this datapoint belongs to
-          readOnly: true
-        time:
+          description: ID of an user
+      description: Represents only a user ID
+    Account:
+      title: Account
+      type: object
+      description: 'User''s account private information, including linked services'
+      properties:
+        id:
           type: string
-          format: date-time
-          description: Instant of this datapoint
+          description: 'Account ID, same as user ID'
           readOnly: true
-        value:
-          type: number
-          format: double
-          description: Value of the metric for this datapoint
+        validationStatus:
+          type: string
+          description: 'Represents the account''s email validation status, can be CONFIRMED or UNCONFIRMED.'
+          enum:
+            - UNCONFIRMED
+            - CONFIRMED
+          readOnly: true
+        email:
+          type: string
+          format: email
+          description: Email of this user
       required:
-        - time
-        - value
-  responses:
-    InternalServerError:
-      description: Unespecified error encountered while processing the request
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              code:
-                type: string
-              description:
-                type: string
-            required:
-              - code
-              - description
-    Collision:
-      description: An entity with the same identifier already exists
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              code:
-                type: string
-              description:
-                type: string
-            required:
-              - code
-              - description
-    BadRequest:
-      description: Request data does not conform to specifications
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              code:
-                type: string
-              description:
-                type: string
-            required:
-              - code
-              - description
-    NotFound:
-      description: Unable to find an entity with a matching ID
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              code:
-                type: string
-                description: ''
-              description:
-                type: string
-            required:
-              - code
-              - description
+        - id
+        - validationStatus
+        - email
 tags:
-  - name: datapoint
-  - name: metric
+  - name: affinity
+  - name: auth
+  - name: browse
+  - name: rating
+  - name: social

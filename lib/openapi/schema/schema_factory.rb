@@ -6,13 +6,16 @@ require 'openapi/schema/integer'
 require 'openapi/schema/null'
 require 'openapi/schema/number'
 require 'openapi/schema/object'
+require 'openapi/schema/ref'
 require 'openapi/schema/string'
 
 module Beekeeper
   module SchemaFactory
     # This is a factory method that returns the appropriate Schema instance from the parsed data
     def self.parse(data, required = false)
-      case data['type']
+      return Beekeeper::Ref.new(data, required) if is_ref? data
+      type = data['type']
+      case type
       when Type::ARRAY then Beekeeper::Array.new(data, required)
       when Type::BOOLEAN then Beekeeper::Boolean.new(data, required)
       when Type::INTEGER then Beekeeper::Integer.new(data, required)
@@ -20,7 +23,7 @@ module Beekeeper
       when Type::NUMBER then Beekeeper::Number.new(data, required)
       when Type::OBJECT then Beekeeper::Object.new(data, required)
       when Type::STRING then Beekeeper::String.new(data, required)
-      else raise "unknown type #{type}"
+      else raise "unknown type `#{type}` in #{data}"
       end
     end
 
@@ -32,6 +35,12 @@ module Beekeeper
       NUMBER = 'number'
       OBJECT = 'object'
       STRING = 'string'
+    end
+
+    private
+
+    def self.is_ref?(data)
+      !data['$ref'].nil?
     end
   end
 end

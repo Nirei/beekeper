@@ -6,8 +6,7 @@ require 'openapi/schema/schema_factory'
 module Beekeeper
   class Object < Schema
     def initialize(data, required)
-      super(data)
-      @required = required
+      super(data, required)
       @required_children = data['required'] || []
       @properties = parse_properties(data['properties'])
       @properties.freeze
@@ -16,8 +15,6 @@ module Beekeeper
       @max_properties = data['maxProperties']
     end
 
-    attr_reader :required
-    alias_method :required?, :required
     attr_reader :properties
     attr_reader :required_children
     attr_reader :additional_properties

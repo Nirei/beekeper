@@ -11,11 +11,20 @@ module Beekeeper
         .downcase
     end
 
+    def self.capitalize_first(string)
+      string[0] = string[0].capitalize
+      string
+    end
+
     def self.camel_case(string)
       string
         .split('_')
-        .map{|e| e.capitalize}
+        .map{|e| capitalize_first e}
         .join
+    end
+
+    def self.inline_model(string)
+      "#{camel_case string}Inline"
     end
 
     def self.indent(line_array, depth=1)

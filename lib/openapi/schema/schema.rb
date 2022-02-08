@@ -4,15 +4,18 @@ module Beekeeper
   # See https://spec.openapis.org/oas/latest.html#schema-object
   # See https://datatracker.ietf.org/doc/html/draft-bhutton-json-schema-00
   class Schema
-    def initialize(data)
+    def initialize(data, required)
       @description = data['description']
       @deprecated = data['deprecated'] || false
       @visibility = Visibility.from_flags(data['readOnly'], data['writeOnly'])
+      @required = required
     end
 
     attr_reader :description
     attr_reader :deprecated
     attr_reader :visibility
+    attr_reader :required
+    alias_method :required?, :required
 
     module Visibility
       READ_WRITE = :read_write

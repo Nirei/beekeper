@@ -5,8 +5,7 @@ require 'openapi/schema/schema'
 module Beekeeper
   class String < Schema
     def initialize(data, required)
-      super(data)
-      @required = required
+      super(data, required)
       @format = data['format'] || StringFormat::NONE
       @default = data['default']
       @pattern = data['pattern']
@@ -16,8 +15,6 @@ module Beekeeper
       @max_length = data['maxLength']
     end
 
-    attr_reader :required
-    alias_method :required?, :required
     attr_reader :default
     attr_reader :enum
     attr_reader :pattern
