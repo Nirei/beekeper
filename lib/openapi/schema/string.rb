@@ -4,8 +4,9 @@ require 'openapi/schema/schema'
 
 module Apiculturist
   class String < Schema
-    def initialize(data)
+    def initialize(data, required)
       super(data)
+      @required = required
       @format = data['format'] || StringFormat::NONE
       @default = data['default']
       @pattern = data['pattern']
@@ -15,6 +16,8 @@ module Apiculturist
       @max_length = data['maxLength']
     end
 
+    attr_reader :required
+    alias_method :required?, :required
     attr_reader :default
     attr_reader :enum
     attr_reader :pattern

@@ -5,25 +5,28 @@ require 'openapi/schema/schema_factory'
 
 module Apiculturist
   class Object < Schema
-    def initialize(data)
+    def initialize(data, required)
       super(data)
+      @required = required
+      @required_children = data['required'] || []
       @properties = parse_properties(data['properties'])
       @properties.freeze
-      @required = data['required'] || []
       @additional_properties = data['additionalProperties'] || false
       @min_properties = data['minProperties']
       @max_properties = data['maxProperties']
     end
 
-    attr_reader :properties
     attr_reader :required
+    alias_method :required?, :required
+    attr_reader :properties
+    attr_reader :required_children
     attr_reader :additional_properties
 
     private
 
     def parse_properties(properties)
       properties ||= {}
-      properties.map { |key, value| [key, SchemaFactory.parse(value)] }
+      properties.map { |key, value| [key, SchemaFactory.parse(value, required_children.include?(key))] }
     end
   end
 end

@@ -1,2 +1,3 @@
-spec: ./test-definition.yml
-output: ./output
+spec-path: ./test-definition.yml
+output-path: output
+module-name: TestModule

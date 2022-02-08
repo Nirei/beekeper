@@ -6,8 +6,8 @@ module Apiculturist
   # Data class to contain necessary config for Apiculturist::Generator
   class GeneratorConfig
     def initialize(config)
-      @spec = parse_attr(config, 'spec')
-      @output = parse_attr(config, 'output')
+      @spec = parse_attr(config, 'spec-path')
+      @output = parse_attr(config, 'output-path')
     end
 
     attr_reader :spec
@@ -16,7 +16,7 @@ module Apiculturist
     private
 
     def parse_attr(config, name)
-      raise Error(ERROR_CONFIG_PARSE.format({ name: name })) if config[name].nil?
+      raise ERROR_CONFIG_PARSE.format({ name: name }) if config[name].nil?
 
       config[name]
     end

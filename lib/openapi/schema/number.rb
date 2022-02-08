@@ -4,8 +4,9 @@ require 'openapi/schema/schema'
 
 module Apiculturist
   class Number < Schema
-    def initialize(data)
+    def initialize(data, required)
       super(data)
+      @required = required
       @format = data['format'] || NumberFormat::NONE
       @enum = data['enum'].clone || []
       @enum.freeze
@@ -16,6 +17,8 @@ module Apiculturist
       @multiple_of = data['multipleOf']
     end
 
+    attr_reader :required
+    alias_method :required?, :required
     attr_reader :format
     attr_reader :enum
     attr_reader :minimum

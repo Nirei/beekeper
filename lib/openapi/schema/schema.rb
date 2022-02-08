@@ -9,7 +9,7 @@ module Apiculturist
       @deprecated = data['deprecated'] || false
       @visibility = Visibility.from_flags(data['readOnly'], data['writeOnly'])
     end
-    
+
     attr_reader :description
     attr_reader :deprecated
     attr_reader :visibility
@@ -22,10 +22,11 @@ module Apiculturist
       ERROR_INCONSISTENT_FLAGS = 'inconsistent visibility flags, cannot be both read only and write only at the same time'
 
       def self.from_flags(read_only, write_only)
-        raise Error() if read_only && write_only
+        raise ERROR_INCONSISTENT_FLAGS if read_only && write_only
         return READ_ONLY if read_only
         return WRITE_ONLY if write_only
-        return READ_WRITE
+
+        READ_WRITE
       end
     end
   end

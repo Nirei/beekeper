@@ -9,17 +9,15 @@ module Apiculturist
   ERROR_CONFIG_NONE = 'Please specify generator configuration'
 
   def self.generate(config: nil, config_file_path: nil)
-    raise Error(ERROR_CONFIG_BOTH) unless config.nil? || config_file_path.nil?
+    raise ERROR_CONFIG_BOTH unless config.nil? || config_file_path.nil?
 
-    raise Error(ERROR_CONFIG_NONE) if config.nil? && config_file_path.nil?
+    raise ERROR_CONFIG_NONE if config.nil? && config_file_path.nil?
 
     config = parse_config(config_file_path) unless config_file_path.nil?
     generator = Generator.new(config)
 
     generator.generate
   end
-
-  private
 
   def self.parse_config(config_file_path)
     # TODO: Create a JSON Schema for the config file, then validate the file against the JSON Schema

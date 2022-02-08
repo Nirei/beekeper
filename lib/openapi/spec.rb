@@ -6,8 +6,8 @@ module Apiculturist
   # Represents an OpenAPI spec
   class Spec
     def initialize(spec)
-      @operations = parse_operations(spec)
-      @models = parse_models(spec)
+      @operations = parse_operations(spec).freeze
+      @models = parse_models(spec).freeze
     end
 
     attr_reader :operations
@@ -15,10 +15,14 @@ module Apiculturist
 
     private
 
-    def parse_operations(spec); end
+    def parse_operations(spec)
+      # TODO: Implement me
+      []
+    end
 
     def parse_models(spec)
       models = spec.dig 'components', 'schemas'
+      models ||= []
       models.map { |(_name, model)| Model.new(model) }
     end
   end
