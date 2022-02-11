@@ -586,6 +586,15 @@ components:
         - id
         - validationStatus
         - email
+    Test:
+      title: ArrayTest
+      type: array
+      description: 'An array of objects to test nesting'
+      items:
+        type: object
+        properties:
+          id:
+            type: string
 tags:
   - name: affinity
   - name: auth

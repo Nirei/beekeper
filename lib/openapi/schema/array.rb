@@ -13,9 +13,13 @@ module Beekeeper
       @items = SchemaFactory.parse(data['items'])
     end
 
+    # Constrain for this array items to be unique
     attr_reader :unique_items
+    # Minimum amount of items that this array can hold
     attr_reader :min_items
+    # Maximum amount of items that this array can hold
     attr_reader :max_items
+    # Schema for the contents of the array
     attr_reader :items
   end
 end

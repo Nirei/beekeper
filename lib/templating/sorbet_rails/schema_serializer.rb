@@ -15,58 +15,60 @@ module Beekeeper
     ERROR_ANOTHER_FILE = 'references to different files are not currently supported'
 
     class SchemaSerializer
-      def initialize(name, schema)
-        @name = name
+      def initialize(schema_name, schema)
+        @schema_name = schema_name
         @schema = schema
         @queue = []
       end
 
       def serialize
-        case schema
-        when Beekeeper::Array then serialize_array
-        when Beekeeper::Boolean then "T::Boolean"
-        when Beekeeper::Integer then "Integer"
-        when Beekeeper::Null then "NilClass"
-        when Beekeeper::Number then "Float"
-        when Beekeeper::Object then serialize_object
-        when Beekeeper::Ref then serialize_ref
-        when Beekeeper::String then "String"
-        else raise "unknown schema class #{schema.class}"
-        end
-      end
-
-      private
-
-      attr_reader :name
-      attr_reader :schema
-      attr_reader :queue
-
-      def serialize_array
-        # TODO: Handle type of the array
-        "T::Array[T.untyped]"
-      end
-
-      def serialize_object
         code = []
-        code.push "# #{schema.description}" unless schema.description.nil?
-        
+        code.push Formatter.comment schema.description unless schema.description.nil?
         code.concat [
-          "class #{Formatter.camel_case name} < T::Struct",
-          Formatter.indent(serialize_object_properties schema.properties),
+          "class #{Formatter.camel_case schema_name} < T::Struct",
+          serialize_toplevel,
           "end",
           "",
-          queue.map(&:serialize)
+          queue.map(&:serialize), # Recursive call
         ]
         code.flatten
       end
 
-      def serialize_ref
+      private
+
+      attr_reader :schema_name
+      attr_reader :schema
+      attr_reader :queue
+
+      def serialize_toplevel
+        case schema
+        when Beekeeper::Object
+          Formatter.indent(serialize_object_properties schema.properties)
+        else
+          Formatter.indent(serialize_property(schema_name, schema))
+        end
+      end
+
+      def serialize_array(name, array)
+        inner = serialize_property_type name, array.items
+        "T::Array[#{inner}]"
+      end
+
+      def serialize_object(name, object)
+        # Nested objects get pushed to the queue for later serialization into T::Struct
+        # The new T::Struct will be named after the property's own name
+        inline_name = Formatter.inline_model name
+        queue.push(SchemaSerializer.new(inline_name, object))
+        Formatter.camel_case inline_name
+      end
+
+      def serialize_ref(name, property)
         # TODO: Support all this stuff I guess
-        raise ERROR_REMOTE_FILE unless schema.uri.host.nil? || schema.uri.host.empty?
-        raise ERROR_ANOTHER_FILE unless schema.uri.path.nil? || schema.uri.path.empty?
+        raise ERROR_REMOTE_FILE unless property.uri.host.nil? || property.uri.host.empty?
+        raise ERROR_ANOTHER_FILE unless property.uri.path.nil? || property.uri.path.empty?
 
         # FIXME: This is in poor taste and relying on too many assumptions
-        model_name = Pathname.new(schema.uri.fragment).split[-1].to_s
+        model_name = Pathname.new(property.uri.fragment).split[-1].to_s
       end
 
       # Iterate over object properties
@@ -76,25 +78,32 @@ module Beekeeper
       end
 
       def serialize_property(name, property)
-          code = []
-          code.push "# #{property.description}" unless property.description.nil?
-          
-          case property
-          when Beekeeper::Object
-            # Nested objects get pushed to the queue for later serialization into T::Struct
-            # The new T::Struct will be named after the property
-            inline_name = Formatter.inline_model name
-            queue.push(SchemaSerializer.new(inline_name, property))
-            value = Formatter.camel_case inline_name
-          else
-            value = SchemaSerializer.new(name, property).serialize
-          end
+        code = []
+        code.push Formatter.comment property.description unless property.description.nil?
 
-          code.push "const :#{Formatter.snake_case name}, #{serialize_nilable property, value}"
+        type = serialize_property_type(name, property)
+        value = serialize_property_nilable(property, type)
+
+        code.push "const :#{Formatter.snake_case name}, #{value}"
+      end
+
+      # From a given property, return its serialized type
+      def serialize_property_type(name, property)
+        case property
+        when Beekeeper::Array then serialize_array(name, property)
+        when Beekeeper::Boolean then "T::Boolean"
+        when Beekeeper::Integer then "Integer"
+        when Beekeeper::Null then "NilClass"
+        when Beekeeper::Number then "Float"
+        when Beekeeper::Object then serialize_object(name, property)
+        when Beekeeper::Ref then serialize_ref(name, property)
+        when Beekeeper::String then "String"
+        else raise "unknown schema class #{property.class}"
+        end
       end
 
       # If the property is not required, wrap it with T.nilable
-      def serialize_nilable(property, value)
+      def serialize_property_nilable(property, value)
         return value if property.required?
         "T.nilable(#{value})"
       end

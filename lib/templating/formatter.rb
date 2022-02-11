@@ -37,5 +37,9 @@ module Beekeeper
         "# api title: #{title}, api version: #{version}, generation date: #{date}"
       ]
     end
+
+    def self.comment(text)
+      "# #{text}"
+    end
   end
 end
