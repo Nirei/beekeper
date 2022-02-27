@@ -3,6 +3,7 @@
 require 'openapi/schema/schema'
 
 module Beekeeper
+  # Integer type from the OpenAPI spec
   class Integer < Schema
     def initialize(data, required)
       super(data, required)

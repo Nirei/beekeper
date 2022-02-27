@@ -3,6 +3,7 @@
 require 'openapi/schema/schema'
 
 module Beekeeper
+  # String type from the OpenAPI spec
   class String < Schema
     def initialize(data, required)
       super(data, required)

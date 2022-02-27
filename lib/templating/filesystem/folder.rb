@@ -22,8 +22,9 @@ module Beekeeper
   #     folder "nested"
   #   end
   # end
-  # ``` 
+  # ```
   module Filesystem
+    # Folder node inside a filesystem
     class Folder < Node
       def initialize(parent, name)
         super(parent, name)
@@ -45,21 +46,25 @@ module Beekeeper
         children.push(node)
       end
 
-      def folder(name, &block)
+      def folder(name)
         child = Folder.new(self, name)
         add(child)
         yield child
       end
 
-      def file(name, &block)
+      def file(name)
         child = File.new(self, name)
         add(child)
         yield child
       end
 
       def write!
-        Dir.mkdir path unless Dir.exists? path
+        Dir.mkdir path unless Dir.exist? path
         children.each(&:write!)
+      end
+
+      def to_s
+        "#<#{self.class.name}:#{path}>"
       end
     end
   end

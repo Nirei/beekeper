@@ -6,22 +6,23 @@ require 'templating/sorbet_rails/schema_serializer'
 
 module Beekeeper
   module SorbetRails
+    # In charge of transforming parsed models into serialized form
     class ModelSerializer
       def initialize(header, module_name)
         @header = header
         @module_name = module_name
       end
-      
+
       def serialize(model)
         schema_serializer = SchemaSerializer.new(model.title, model.schema)
         [
           Constants::SORBET_TYPED_STRICT_HINT,
-          "",
+          '',
           header,
-          "",
+          '',
           "module #{module_name}",
           Formatter.indent(schema_serializer.serialize),
-          "end"
+          'end'
         ].flatten
       end
 

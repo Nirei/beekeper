@@ -2,6 +2,7 @@
 
 module Beekeeper
   module Filesystem
+    # Abstract base class for filesystem nodes
     class Node
       def initialize(parent, name)
         @parent = parent
@@ -13,7 +14,8 @@ module Beekeeper
 
       def path
         return name if parent.nil?
-        return ::File.join(parent.path, name)
+
+        ::File.join(parent.path, name)
       end
     end
   end

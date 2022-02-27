@@ -5,6 +5,7 @@ require 'openapi/schema/schema'
 require 'openapi/schema/schema_factory'
 
 module Beekeeper
+  # Ref type from the OpenAPI spec
   class Ref < Schema
     def initialize(data, required)
       super(data, required)

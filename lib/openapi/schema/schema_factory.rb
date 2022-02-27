@@ -10,10 +10,12 @@ require 'openapi/schema/ref'
 require 'openapi/schema/string'
 
 module Beekeeper
+  # Factory for Schema subclasses that picks the appropriate class for a schema by reading the OpenAPI type information
   module SchemaFactory
     # This is a factory method that returns the appropriate Schema instance from the parsed data
-    def self.parse(data, required = false)
-      return Beekeeper::Ref.new(data, required) if is_ref? data
+    def self.parse(data, required: false)
+      return Beekeeper::Ref.new(data, required) if ref? data
+
       type = data['type']
       case type
       when Type::ARRAY then Beekeeper::Array.new(data, required)
@@ -37,9 +39,9 @@ module Beekeeper
       STRING = 'string'
     end
 
-    private
+    private_class_method :ref?
 
-    def self.is_ref?(data)
+    def self.ref?(data)
       !data['$ref'].nil?
     end
   end

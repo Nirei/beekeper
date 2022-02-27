@@ -6,6 +6,7 @@ require 'templating/filesystem/folder'
 require 'templating/sorbet_rails/model_serializer'
 
 module Beekeeper
+  # In charge of transforming the OpenAPI spec to code
   class TemplatingEngine
     def initialize(config)
       @output_path = config['output-path']
@@ -20,21 +21,21 @@ module Beekeeper
       model_serializer = SorbetRails::ModelSerializer.new(header, module_name)
 
       Filesystem::Folder.root(output_path) do |fs|
-        fs.folder 'models' do |fs|
+        fs.folder 'models' do |models_folder|
           spec.models.map do |model|
-            fs.file "#{Formatter.snake_case model.title}.rb" do |fs|
+            models_folder.file "#{Formatter.snake_case model.title}.rb" do |file|
               model_serializer.serialize(model).each do |content|
-                fs.line content
+                file.line content
               end
             end
           end
         end
-        fs.folder 'controllers' do |fs|
-          # TODO: Create controller files
+        fs.folder 'api' do |api_folder|
+          # TODO: Generate controllers
         end
-        fs.folder 'config' do |fs|
-          fs.file 'routes.rb' do |fs|
-            fs.line '# TODO: Add rails routes file content'
+        fs.folder 'config' do |config_folder|
+          config_folder.file 'routes.rb' do |routes_file|
+            routes_file.line '# TODO: Add rails routes file content'
           end
         end
       end

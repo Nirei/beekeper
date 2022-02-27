@@ -4,6 +4,7 @@ require 'openapi/schema/schema'
 require 'openapi/schema/schema_factory'
 
 module Beekeeper
+  # Array type from the OpenAPI spec
   class Array < Schema
     def initialize(data, required)
       super(data, required)

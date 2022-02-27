@@ -14,6 +14,7 @@ module Beekeeper
     ERROR_REMOTE_FILE = 'references to remote files are not currently supported'
     ERROR_ANOTHER_FILE = 'references to different files are not currently supported'
 
+    # In charge of transforming parsed schemas into serialized form
     class SchemaSerializer
       def initialize(schema_name, schema)
         @schema_name = schema_name
@@ -27,9 +28,9 @@ module Beekeeper
         code.concat [
           "class #{Formatter.camel_case schema_name} < T::Struct",
           serialize_toplevel,
-          "end",
-          "",
-          queue.map(&:serialize), # Recursive call
+          'end',
+          '',
+          queue.map(&:serialize) # Recursive call
         ]
         code.flatten
       end
@@ -43,7 +44,7 @@ module Beekeeper
       def serialize_toplevel
         case schema
         when Beekeeper::Object
-          Formatter.indent(serialize_object_properties schema.properties)
+          Formatter.indent(serialize_object_properties(schema.properties))
         else
           Formatter.indent(serialize_property(schema_name, schema))
         end
@@ -62,13 +63,13 @@ module Beekeeper
         Formatter.camel_case inline_name
       end
 
-      def serialize_ref(name, property)
+      def serialize_ref(_name, property)
         # TODO: Support all this stuff I guess
         raise ERROR_REMOTE_FILE unless property.uri.host.nil? || property.uri.host.empty?
         raise ERROR_ANOTHER_FILE unless property.uri.path.nil? || property.uri.path.empty?
 
         # FIXME: This is in poor taste and relying on too many assumptions
-        model_name = Pathname.new(property.uri.fragment).split[-1].to_s
+        Pathname.new(property.uri.fragment).split[-1].to_s
       end
 
       # Iterate over object properties
@@ -91,13 +92,13 @@ module Beekeeper
       def serialize_property_type(name, property)
         case property
         when Beekeeper::Array then serialize_array(name, property)
-        when Beekeeper::Boolean then "T::Boolean"
-        when Beekeeper::Integer then "Integer"
-        when Beekeeper::Null then "NilClass"
-        when Beekeeper::Number then "Float"
+        when Beekeeper::Boolean then 'T::Boolean'
+        when Beekeeper::Integer then 'Integer'
+        when Beekeeper::Null then 'NilClass'
+        when Beekeeper::Number then 'Float'
         when Beekeeper::Object then serialize_object(name, property)
         when Beekeeper::Ref then serialize_ref(name, property)
-        when Beekeeper::String then "String"
+        when Beekeeper::String then 'String'
         else raise "unknown schema class #{property.class}"
         end
       end
@@ -105,9 +106,9 @@ module Beekeeper
       # If the property is not required, wrap it with T.nilable
       def serialize_property_nilable(property, value)
         return value if property.required?
+
         "T.nilable(#{value})"
       end
-
     end
   end
 end

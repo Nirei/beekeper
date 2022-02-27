@@ -3,6 +3,7 @@
 require 'openapi/schema/schema'
 
 module Beekeeper
+  # Boolean type from the OpenAPI spec
   class Boolean < Schema
     def initialize(data, required)
       super(data, required)
