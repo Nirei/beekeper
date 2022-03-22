@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'openapi/parameter'
+
 module Beekeeper
   # Contains an OpenAPI operation definition
   class Operation
@@ -12,7 +14,8 @@ module Beekeeper
       @description = operation['description']
 
       @parameters = parse_parameters(operation)
-      @responses = parse_responses(operation_id, operation)
+      @request_body = parse_request_body(operation)
+      @responses = parse_responses(operation)
 
       puts method
       puts path
@@ -27,14 +30,26 @@ module Beekeeper
     attr_reader :summary
     attr_reader :description
     attr_reader :parameters
+    attr_reader :request_body
     attr_reader :responses
 
+    private
+
     def parse_parameters(operation)
-      # TODO: Implement
-      nil
+      operation['parameters']&.map do |parameter|
+        [parameter['name'], Parameter.new(parameter)]
+      end.to_h || {}
     end
 
-    def parse_responses(operation_id, operation)
+    def parse_request_body(operation)
+      # TODO: Support other types of data besides application/json
+      request_body_schema = operation.dig 'requestBody', 'content', 'application/json', 'schema'
+      return if request_body_schema.nil?
+
+      SchemaFactory.parse(request_body_schema)
+    end
+
+    def parse_responses(_operation)
       # TODO: Implement
       nil
     end

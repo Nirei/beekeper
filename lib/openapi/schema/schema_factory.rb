@@ -39,10 +39,10 @@ module Beekeeper
       STRING = 'string'
     end
 
-    private_class_method :ref?
-
     def self.ref?(data)
       !data['$ref'].nil?
     end
+
+    private_class_method :ref?
   end
 end

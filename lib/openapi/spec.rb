@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'openapi/model'
-require 'openapi/operation'
+require 'openapi/path'
 
 module Beekeeper
   # Represents an OpenAPI spec
@@ -12,7 +12,7 @@ module Beekeeper
       @version = spec.dig('info', 'version') || ''
       @tags = spec['tags'] || []
 
-      @operations = parse_operations(spec)
+      @paths = parse_paths(spec)
       @models = parse_models(spec)
     end
 
@@ -21,19 +21,15 @@ module Beekeeper
     attr_reader :version
 
     attr_reader :tags
-    attr_reader :operations
+    attr_reader :paths
     attr_reader :models
 
     private
 
-    def parse_operations(spec)
+    def parse_paths(spec)
       paths = spec['paths'] || []
       paths.map do |path, values|
-        operations = values.reject { |key, _value| key == 'parameters' }
-
-        operations.map do |method, operation|
-          Operation.new(method, path, operation)
-        end
+        Path.new(path, values)
       end
     end
 

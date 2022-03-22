@@ -24,7 +24,7 @@ module Beekeeper
 
     def parse_properties(properties)
       properties ||= {}
-      properties.map { |key, value| [key, SchemaFactory.parse(value, required_children.include?(key))] }
+      properties.map { |key, value| [key, SchemaFactory.parse(value, required: required_children.include?(key))] }
     end
   end
 end
