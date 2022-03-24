@@ -1,4 +1,6 @@
+![Beekeeper logo. Four hexagonal honeycomb cells disposed in a semicircle around a smaller one, resembling the ball and socket connector used to represent interface/implementation on UML diagrams.](./doc/logo.svg)
 # beekeeper
+
 A static code generator that turns OpenAPI definitions into sorbet-rails code. It's 100% written in Ruby and has no
 dependencies. The intention is to keep it simple and blazingly fast.
 
