@@ -8,18 +8,24 @@ module Beekeeper
     class File < Node
       def initialize(parent, name)
         super(parent, name)
-        @lines = []
+        @buffer = []
       end
 
-      attr_reader :lines
+      attr_reader :buffer
 
+      # Append a line to the file
       def line(input = '')
-        lines.push(input.to_s)
+        buffer.push(input.to_s)
+      end
+
+      # Append multiple lines to the file given as an array of strings
+      def lines(input)
+        buffer.concat(input.map(&:to_s))
       end
 
       def write!
         ::File.open(path, 'w') do |f|
-          lines.each { |line| f.puts(line) }
+          buffer.each { |line| f.puts(line) }
         end
       end
     end

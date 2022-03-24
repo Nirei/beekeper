@@ -32,9 +32,14 @@ module Beekeeper
       "#{camel_case string}Inline"
     end
 
-    # Indents an array of lines (strings) to the desired `depth` using two spaces for each level
+    def self.controller_name(string)
+      "#{camel_case string}Controller"
+    end
+
+    # Indents an array of lines (strings) to the desired `depth` using two spaces for each level. Empty lines are not
+    # indented
     def self.indent(line_array, depth = 1)
-      line_array.map { |line| "#{'  ' * depth}#{line}" }
+      line_array.map { |line| line.to_s.length.positive? ? "#{'  ' * depth}#{line}" : line }
     end
 
     # Returns the file header for Ruby code files with the appropriate data embedded
@@ -48,6 +53,19 @@ module Beekeeper
     # Returns the given text as a comment
     def self.comment(text)
       "# #{text}"
+    end
+
+    # Returns all the input array elements separated by an empty string between each of them. Useful when dealing with
+    # line arrays to space elements with line breaks
+    def self.separate(input)
+      return [] unless input.length.positive?
+
+      output = []
+      output.push(input[0])
+      (1...input.length).each do |index|
+        output.push('', input[index])
+      end
+      output
     end
   end
 end

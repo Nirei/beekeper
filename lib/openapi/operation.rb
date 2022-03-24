@@ -16,11 +16,6 @@ module Beekeeper
       @parameters = parse_parameters(operation)
       @request_body = parse_request_body(operation)
       @responses = parse_responses(operation)
-
-      puts method
-      puts path
-      puts operation
-      puts
     end
 
     attr_reader :method

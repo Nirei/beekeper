@@ -10,8 +10,8 @@ module Beekeeper
       @openapi_version = (spec['openapi']) || ''
       @title = spec.dig('info', 'title') || ''
       @version = spec.dig('info', 'version') || ''
-      @tags = spec['tags'] || []
 
+      @tags = parse_tags(spec)
       @paths = parse_paths(spec)
       @models = parse_models(spec)
     end
@@ -25,6 +25,11 @@ module Beekeeper
     attr_reader :models
 
     private
+
+    def parse_tags(spec)
+      tag_list = spec['tags'] || []
+      tag_list.map { |tag| tag['name'] }
+    end
 
     def parse_paths(spec)
       paths = spec['paths'] || []

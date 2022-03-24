@@ -8,8 +8,7 @@ module Beekeeper
   # Core class in charge of code generation
   class Generator
     def initialize(config)
-      @config = GeneratorConfig.new(config)
-      @engine = TemplatingEngine.new(config)
+      @config = config
     end
 
     # Implements the information flow that goes from an OpenAPI spec to a series of statically generated Ruby files that
@@ -23,14 +22,13 @@ module Beekeeper
     private
 
     attr_reader :config
-    attr_reader :engine
 
     def parse_spec
-      SpecParser.parse(config.spec)
+      SpecParser.parse(GeneratorConfig.new(config).spec)
     end
 
     def create_code(spec)
-      engine.codify(spec)
+      TemplatingEngine.new(config, spec).codify
     end
 
     def write_output(files)
