@@ -39,7 +39,7 @@ module Beekeeper
     # Indents an array of lines (strings) to the desired `depth` using two spaces for each level. Empty lines are not
     # indented
     def self.indent(line_array, depth = 1)
-      line_array.map { |line| line.to_s.length.positive? ? "#{'  ' * depth}#{line}" : line }
+      line_array.map { |line| line.to_s.empty? ? line : "#{'  ' * depth}#{line}" }
     end
 
     # Returns the file header for Ruby code files with the appropriate data embedded
@@ -58,7 +58,7 @@ module Beekeeper
     # Returns all the input array elements separated by an empty string between each of them. Useful when dealing with
     # line arrays to space elements with line breaks
     def self.separate(input)
-      return [] unless input.length.positive?
+      return [] if input.empty?
 
       output = []
       output.push(input[0])

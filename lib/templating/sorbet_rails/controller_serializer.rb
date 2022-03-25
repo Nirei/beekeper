@@ -3,6 +3,7 @@
 require 'templating/formatter'
 require 'templating/sorbet_rails/constants'
 require 'templating/sorbet_rails/schema_serializer'
+require 'templating/sorbet_rails/type_mapper'
 
 module Beekeeper
   module SorbetRails
@@ -45,6 +46,8 @@ module Beekeeper
         method_lines = Formatter.separate(methods).flatten
 
         [
+          Constants::SORBET_EXTEND_T_SIG,
+          Constants::SORBET_EXTEND_T_HELPERS,
           'abstract!',
           '',
           method_lines
@@ -52,10 +55,35 @@ module Beekeeper
       end
 
       def serialize_operation(operation)
+        parameter_signatures = serialize_parameter_signatures(operation.parameters)
+        parameter_arguments = serialize_parameter_arguments(operation.parameters)
+
+        # XXX: Missing path parameters!!!
         code = []
         code.push Formatter.comment operation.description unless operation.description.nil?
-        code.push("def #{Formatter.snake_case operation.operation_id}; end")
+        code.push("sig { abstract.#{parameter_signatures}void }")
+        code.push("def #{Formatter.snake_case operation.operation_id}#{parameter_arguments}; end")
         code
+      end
+
+      def serialize_parameter_signatures(parameters)
+        return '' if parameters.empty?
+
+        serialized = parameters.map do |name, parameter|
+          "#{Formatter.snake_case name}: #{TypeMapper.to_sorbet parameter.schema}"
+        end
+
+        "params(#{serialized.join(', ')})."
+      end
+
+      def serialize_parameter_arguments(parameters)
+        return '' if parameters.empty?
+
+        serialized = parameters.map do |name, parameter|
+          Formatter.snake_case name
+        end
+
+        "(#{serialized.join(', ')})"
       end
 
       attr_reader :header

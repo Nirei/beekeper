@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'openapi/schema/type'
 require 'openapi/schema/array'
 require 'openapi/schema/boolean'
 require 'openapi/schema/integer'
@@ -27,16 +28,6 @@ module Beekeeper
       when Type::STRING then Beekeeper::String.new(data, required)
       else raise "unknown type `#{type}` in #{data}"
       end
-    end
-
-    module Type
-      ARRAY = 'array'
-      BOOLEAN = 'boolean'
-      INTEGER = 'integer'
-      NULL = 'null'
-      NUMBER = 'number'
-      OBJECT = 'object'
-      STRING = 'string'
     end
 
     def self.ref?(data)
