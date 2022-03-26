@@ -8,9 +8,14 @@ module Beekeeper
     def initialize(data)
       @name = data['name']
       @schema = SchemaFactory.parse(data['schema'])
+      @in = data['in']
     end
 
+    # Parameter name
     attr_reader :name
+    # Parameter schema
     attr_reader :schema
+    # Parameter location (query, path...)
+    attr_reader :in
   end
 end

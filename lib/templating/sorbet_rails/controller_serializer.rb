@@ -55,10 +55,10 @@ module Beekeeper
       end
 
       def serialize_operation(operation)
-        parameter_signatures = serialize_parameter_signatures(operation.parameters)
-        parameter_arguments = serialize_parameter_arguments(operation.parameters)
+        all_parameters = operation.path.parameters.values + operation.parameters.values
+        parameter_signatures = serialize_parameter_signatures(all_parameters)
+        parameter_arguments = serialize_parameter_arguments(all_parameters)
 
-        # XXX: Missing path parameters!!!
         code = []
         code.push Formatter.comment operation.description unless operation.description.nil?
         code.push("sig { abstract.#{parameter_signatures}void }")
@@ -69,8 +69,8 @@ module Beekeeper
       def serialize_parameter_signatures(parameters)
         return '' if parameters.empty?
 
-        serialized = parameters.map do |name, parameter|
-          "#{Formatter.snake_case name}: #{TypeMapper.to_sorbet parameter.schema}"
+        serialized = parameters.map do |parameter|
+          "#{Formatter.snake_case parameter.name}: #{TypeMapper.to_sorbet parameter.schema}"
         end
 
         "params(#{serialized.join(', ')})."
@@ -79,8 +79,8 @@ module Beekeeper
       def serialize_parameter_arguments(parameters)
         return '' if parameters.empty?
 
-        serialized = parameters.map do |name, parameter|
-          Formatter.snake_case name
+        serialized = parameters.map do |parameter|
+          Formatter.snake_case parameter.name
         end
 
         "(#{serialized.join(', ')})"
